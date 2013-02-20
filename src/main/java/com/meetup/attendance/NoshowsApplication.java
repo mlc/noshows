@@ -1,5 +1,5 @@
 
-package com.meetup.attendence;
+package com.meetup.attendance;
 
 import android.app.Application;
 import org.acra.ACRA;
