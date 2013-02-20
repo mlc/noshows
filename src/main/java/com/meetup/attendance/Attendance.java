@@ -1,4 +1,3 @@
-
 package com.meetup.attendance;
 
 import android.app.Activity;
@@ -6,8 +5,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.widget.TextView;
 
-public class Attendance
-    extends Activity
+public class Attendance extends Activity
 {
 
     private TextView hello;
