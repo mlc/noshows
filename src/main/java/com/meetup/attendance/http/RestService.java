@@ -119,7 +119,7 @@ public class RestService extends IntentService {
                 bld.append(',');
                 first = false;
             }
-            bld.append(key).append('=').append(val);
+            bld.append(Uri.encode(key)).append('=').append(Uri.encode(val));
         }
         postreq.setHeader("Authorization", bld.toString());
     }
