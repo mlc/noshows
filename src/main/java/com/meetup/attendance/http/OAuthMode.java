@@ -4,7 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 public enum OAuthMode implements Parcelable {
-    DONT_SIGN, APP_SIGN, USER_SIGN;
+    DONT_SIGN, APP_SIGN, USER_SIGN, CUSTOM_SIGN;
 
     @Override
     public int describeContents() {

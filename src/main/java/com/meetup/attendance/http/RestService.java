@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.os.ResultReceiver;
 import android.util.Log;
+import android.util.Pair;
 import com.google.common.base.Predicate;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
@@ -79,7 +80,13 @@ public class RestService extends IntentService {
             default:
                 throw new IllegalStateException();
             }
-            HttpResponse resp = HttpWrapper.getInstance().exec(req, oAuthMode);
+            final Pair<String, String> token;
+            if (extras.containsKey("token") && extras.containsKey("token_secret")) {
+                token = Pair.create(extras.getString("token"), extras.getString("token_secret"));
+            } else {
+                token = null;
+            }
+            HttpResponse resp = HttpWrapper.getInstance().exec(req, oAuthMode, token);
             HttpEntity entity = resp.getEntity();
             StatusLine statusLine = resp.getStatusLine();
             int statusCode = statusLine == null ? -1 : statusLine.getStatusCode();
@@ -184,14 +191,24 @@ public class RestService extends IntentService {
         }
     }
 
-    public static void call(@Nonnull RestFragment caller, @Nonnull Verb verb, @Nonnull Uri uri, @Nonnull OAuthMode oAuthMode, @Nullable ParseMode parseMode, @Nullable Bundle params) {
+    public static void call(@Nonnull RestFragment caller, @Nonnull Verb verb, @Nonnull Uri uri, @Nullable ParseMode parseMode, @Nullable Bundle params) {
+        call(caller, verb, uri, OAuthMode.USER_SIGN, null, parseMode, params);
+    }
+
+    public static void call(@Nonnull RestFragment caller, @Nonnull Verb verb, @Nonnull Uri uri, @Nonnull OAuthMode oAuthMode, Pair<String, String> token, @Nullable ParseMode parseMode, @Nullable Bundle params) {
         Context ctx = caller.getActivity();
         Intent intent = new Intent(ctx, RestService.class);
         intent.setData(uri);
         intent.putExtra("verb", (Parcelable)verb);
         intent.putExtra("oauth_mode", (Parcelable)oAuthMode);
-        intent.putExtra("parse_mode", (Parcelable)parseMode);
-        intent.putExtra("params", params);
+        if (parseMode != null)
+            intent.putExtra("parse_mode", (Parcelable)parseMode);
+        if (token != null) {
+            intent.putExtra("token", token.first);
+            intent.putExtra("token_secret", token.second);
+        }
+        if (params != null)
+            intent.putExtra("params", params);
         intent.putExtra("receiver", caller.getReceiver());
         ctx.startService(intent);
     }

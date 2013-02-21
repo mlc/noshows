@@ -30,6 +30,7 @@ import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.util.Locale;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 public class HttpWrapper {
@@ -86,14 +87,15 @@ public class HttpWrapper {
         return INSTANCE;
     }
 
-    public HttpResponse exec(HttpUriRequest request, OAuthMode authMode) throws IOException {
+    public HttpResponse exec(HttpUriRequest request, OAuthMode authMode, Pair<String, String> token) throws IOException {
         if (authMode != OAuthMode.DONT_SIGN) {
-            final @Nonnull Pair<String, String> token;
             if (authMode == OAuthMode.APP_SIGN) {
                 token = Pair.create(null, null);
-            } else {
+            } else if (authMode == OAuthMode.USER_SIGN) {
                 token = PreferenceUtility.getInstance().getOauthCreds();
                 checkState(token.first != null && token.second != null, "must be logged in to do a fully-signed OAuth request");
+            } else {
+                checkNotNull(token, "provided token can not be null");
             }
             try {
                 synchronized (oAuthConsumer) {
