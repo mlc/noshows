@@ -1,22 +1,23 @@
 package com.meetup.attendance.attendance;
 
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ListAdapter;
 import android.widget.TextView;
 import com.meetup.attendance.R;
 import com.meetup.attendance.rest.AttendanceRecord;
 
 public class AttendanceAdapter extends ArrayAdapter<AttendanceRecord> {
     private final LayoutInflater inflater;
+    private final String urlname, eventId;
 
-    public AttendanceAdapter(Context context) {
+    public AttendanceAdapter(Attendance context) {
         super(context, 0);
         inflater = LayoutInflater.from(context);
+        urlname = context.getIntent().getStringExtra("urlname");
+        eventId = context.getIntent().getStringExtra("event_id");
     }
 
     @Override
@@ -42,6 +43,7 @@ public class AttendanceAdapter extends ArrayAdapter<AttendanceRecord> {
         AttendanceRecord ar = getItem(position);
         tag.memberName.setText(ar.member.name);
         tag.memberStatus.setText(ar.rsvp.response.toString() + ", " + ar.status.toString());
+        tag.change.setOnClickListener(new ChangeListener(getContext(), ar, urlname, eventId));
         return view;
     }
 

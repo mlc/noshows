@@ -99,12 +99,14 @@ public class RestService extends IntentService {
             } else {
                 b = parseResponse(entity, extras);
             }
-            receiver.send(statusCode, b);
+            if (receiver != null)
+                receiver.send(statusCode, b);
         } catch (IOException ex) {
             Log.e(TAG, "IO Exception", ex);
             Bundle b = new Bundle();
             b.putSerializable("exception", ex);
-            receiver.send(-1, b);
+            if (receiver != null)
+                receiver.send(-1, b);
         }
     }
 
@@ -112,12 +114,10 @@ public class RestService extends IntentService {
         if (params == null)
             return;
 
-        List<String> toRemove = Lists.newArrayList(Iterables.filter(params.keySet(), new Predicate<String>() {
-            @Override
-            public boolean apply(@Nullable String input) {
-                return (input != null && input.startsWith("oauth_"));
-            }
-        }));
+        List<String> toRemove = Lists.newArrayList(Iterables.filter(params.keySet(), BeginsWithOauth.INSTANCE));
+        if (toRemove.isEmpty())
+            return;
+
         StringBuilder bld = new StringBuilder("OAuth ");
 
         boolean first = true;
@@ -216,7 +216,14 @@ public class RestService extends IntentService {
     }
 
     public static void call(@Nonnull RestFragment caller, @Nonnull Verb verb, @Nonnull Uri uri, @Nonnull OAuthMode oAuthMode, Pair<String, String> token, @Nullable ParseMode parseMode, @Nullable Bundle params) {
-        Context ctx = caller.getActivity();
+        call(caller.getActivity(), caller.getReceiver(), verb, uri, oAuthMode, token, parseMode, params);
+    }
+
+    public static void call(@Nonnull Context ctx, @Nonnull Verb verb, @Nonnull Uri uri, @Nullable ParseMode parseMode, @Nullable Bundle params) {
+        call(ctx, null, verb, uri, OAuthMode.USER_SIGN, null, parseMode, params);
+    }
+
+    public static void call(@Nonnull Context ctx, @Nullable ResultReceiver receiver, @Nonnull Verb verb, @Nonnull Uri uri, @Nonnull OAuthMode oAuthMode, Pair<String, String> token, @Nullable ParseMode parseMode, @Nullable Bundle params) {
         Intent intent = new Intent(ctx, RestService.class);
         intent.setData(uri);
         intent.putExtra("verb", (Parcelable)verb);
@@ -229,7 +236,16 @@ public class RestService extends IntentService {
         }
         if (params != null)
             intent.putExtra("params", params);
-        intent.putExtra("receiver", caller.getReceiver());
+        intent.putExtra("receiver", receiver);
         ctx.startService(intent);
+    }
+
+    private static class BeginsWithOauth implements Predicate<String> {
+        public static BeginsWithOauth INSTANCE = new BeginsWithOauth();
+
+        @Override
+        public boolean apply(@Nullable String input) {
+            return (input != null && input.startsWith("oauth_"));
+        }
     }
 }
