@@ -3,23 +3,27 @@ package com.meetup.attendance.http;
 import android.os.Parcel;
 import android.os.Parcelable;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.meetup.attendance.rest.AttendanceRecord;
 import com.meetup.attendance.rest.EventsResponse;
+
+import java.util.ArrayList;
 
 public enum ParseMode implements Parcelable {
     STRING, HTTP_ENTITY,
-    EVENTS_RESPONSE(EventsResponse.class);
+    EVENTS_RESPONSE(EventsResponse.class),
+    ATTENDANCE_RECORDS(new TypeReference<ArrayList<AttendanceRecord>>() {});
 
-    private final Class<? extends Parcelable> jsonType;
+    private final Object jsonType;
 
     private ParseMode() {
         this(null);
     }
 
-    private ParseMode(Class<? extends Parcelable> jsonType) {
+    private ParseMode(Object jsonType) {
         this.jsonType = jsonType;
     }
 
-    public Class<? extends Parcelable> getJsonType() {
+    public Object getJsonType() {
         return jsonType;
     }
 

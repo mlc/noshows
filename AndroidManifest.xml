@@ -26,6 +26,7 @@
         <activity
             android:name=".auth.Auth"
             android:exported="false"/>
+        <activity android:name=".attendance.Attendance" />
 
         <service android:name=".http.RestService"
             android:exported="false"/>

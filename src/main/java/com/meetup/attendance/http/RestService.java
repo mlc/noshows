@@ -9,6 +9,8 @@ import android.os.Parcelable;
 import android.os.ResultReceiver;
 import android.util.Log;
 import android.util.Pair;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.base.Predicate;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
@@ -32,6 +34,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -147,8 +150,22 @@ public class RestService extends IntentService {
                 break;
 
             default:
-                // OMG Type-Safety with generics
-                b.putParcelable("json", JsonUtil.getFactory().createParser(entity.getContent()).readValueAs(mode.getJsonType()));
+                JsonParser jp = JsonUtil.getFactory().createParser(entity.getContent());
+                Object type = mode.getJsonType();
+                if (type instanceof Class) {
+                    //noinspection unchecked
+                    b.putParcelable("json", jp.readValueAs((Class<? extends Parcelable>)mode.getJsonType()));
+                } else if (type instanceof TypeReference) {
+                    Object o = jp.readValueAs((TypeReference)type);
+                    if (o instanceof Parcelable) {
+                        b.putParcelable("json", (Parcelable)o);
+                    } else if (o instanceof ArrayList) {
+                        //noinspection unchecked
+                        b.putParcelableArrayList("json", (ArrayList<? extends Parcelable>) o);
+                    } else {
+                        throw new AssertionError();
+                    }
+                }
             }
             return b;
         } finally {

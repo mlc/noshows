@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.Window;
 import android.widget.ListView;
 import com.meetup.attendance.PreferenceUtility;
+import com.meetup.attendance.attendance.Attendance;
 import com.meetup.attendance.auth.Auth;
 import com.meetup.attendance.rest.Event;
 import com.meetup.attendance.rest.EventsResponse;
@@ -64,5 +65,9 @@ public class EventList extends ListActivity {
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
         Event e = adapter.getItem(position);
+        Intent i = new Intent(this, Attendance.class)
+                .putExtra("urlname", e.group.urlname)
+                .putExtra("event_id", e.id);
+        startActivity(i);
     }
 }

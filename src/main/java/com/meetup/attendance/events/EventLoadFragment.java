@@ -30,7 +30,7 @@ public class EventLoadFragment extends RestFragment {
         args.putString("member_id", "self");
         args.putString("status", "past,upcoming");
         long now = System.currentTimeMillis();
-        args.putString("time", (now - 1*TimeUnit.WEEK) + "," + (now + 1*TimeUnit.WEEK));
+        args.putString("time", (now - 1*TimeUnit.WEEK) + "," + now);
         args.putInt("page", 100);
         RestService.call(this, Verb.GET, ENDPOINT, ParseMode.EVENTS_RESPONSE, args);
     }
