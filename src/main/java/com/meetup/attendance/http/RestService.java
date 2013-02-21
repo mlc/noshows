@@ -110,6 +110,8 @@ public class RestService extends IntentService {
         }
     }
 
+    // cheat: based on our knowledge of how Signpost works, this will allow
+    // us to add extra OAuth parameters. This is a terrible hack, but works.
     private static void extractOauthParams(HttpPost postreq, Bundle params) {
         if (params == null)
             return;
@@ -127,6 +129,7 @@ public class RestService extends IntentService {
             params.remove(key);
             if (!first) {
                 bld.append(',');
+            } else {
                 first = false;
             }
             bld.append(Uri.encode(key)).append('=').append(Uri.encode(val));
@@ -150,26 +153,31 @@ public class RestService extends IntentService {
                 break;
 
             default:
-                JsonParser jp = JsonUtil.getFactory().createParser(entity.getContent());
-                Object type = mode.getJsonType();
-                if (type instanceof Class) {
-                    //noinspection unchecked
-                    b.putParcelable("json", jp.readValueAs((Class<? extends Parcelable>)mode.getJsonType()));
-                } else if (type instanceof TypeReference) {
-                    Object o = jp.readValueAs((TypeReference)type);
-                    if (o instanceof Parcelable) {
-                        b.putParcelable("json", (Parcelable)o);
-                    } else if (o instanceof ArrayList) {
-                        //noinspection unchecked
-                        b.putParcelableArrayList("json", (ArrayList<? extends Parcelable>) o);
-                    } else {
-                        throw new AssertionError();
-                    }
-                }
+                parseJson(entity, mode.getJsonType(), b);
             }
             return b;
         } finally {
             entity.consumeContent();
+        }
+    }
+
+    private static void parseJson(HttpEntity entity, Object type, Bundle b) throws IOException {
+        JsonParser jp = JsonUtil.getFactory().createParser(entity.getContent());
+        if (type instanceof Class) {
+            //noinspection unchecked
+            b.putParcelable("json", jp.readValueAs((Class<? extends Parcelable>)type));
+        } else if (type instanceof TypeReference) {
+            Object o = jp.readValueAs((TypeReference)type);
+            if (o instanceof Parcelable) {
+                b.putParcelable("json", (Parcelable)o);
+            } else if (o instanceof ArrayList) {
+                //noinspection unchecked
+                b.putParcelableArrayList("json", (ArrayList<? extends Parcelable>) o);
+            } else {
+                throw new AssertionError();
+            }
+        } else {
+            throw new AssertionError();
         }
     }
 
