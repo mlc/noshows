@@ -33,7 +33,7 @@ import java.util.Locale;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
-public class HttpWrapper {
+class HttpWrapper {
     private static final HttpWrapper INSTANCE = new HttpWrapper();
 
     private final HttpClient client;

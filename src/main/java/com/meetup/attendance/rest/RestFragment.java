@@ -1,4 +1,4 @@
-package com.meetup.attendance;
+package com.meetup.attendance.rest;
 
 import android.app.Fragment;
 import android.os.Bundle;

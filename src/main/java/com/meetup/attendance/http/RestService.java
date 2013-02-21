@@ -13,7 +13,8 @@ import com.google.common.base.Predicate;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import com.meetup.attendance.RestFragment;
+import com.meetup.attendance.json.JsonUtil;
+import com.meetup.attendance.rest.RestFragment;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -21,7 +22,6 @@ import org.apache.http.StatusLine;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.*;
 import org.apache.http.client.utils.URIUtils;
-import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
@@ -143,9 +143,12 @@ public class RestService extends IntentService {
                 break;
 
             case STRING:
-            default:
                 b.putString("response", EntityUtils.toString(entity));
                 break;
+
+            default:
+                // OMG Type-Safety with generics
+                b.putParcelable("json", JsonUtil.getFactory().createParser(entity.getContent()).readValueAs(mode.getJsonType()));
             }
             return b;
         } finally {

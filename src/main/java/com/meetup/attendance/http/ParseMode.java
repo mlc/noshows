@@ -2,9 +2,26 @@ package com.meetup.attendance.http;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.meetup.attendance.rest.EventsResponse;
 
 public enum ParseMode implements Parcelable {
-    STRING, HTTP_ENTITY;
+    STRING, HTTP_ENTITY,
+    EVENTS_RESPONSE(EventsResponse.class);
+
+    private final Class<? extends Parcelable> jsonType;
+
+    private ParseMode() {
+        this(null);
+    }
+
+    private ParseMode(Class<? extends Parcelable> jsonType) {
+        this.jsonType = jsonType;
+    }
+
+    public Class<? extends Parcelable> getJsonType() {
+        return jsonType;
+    }
 
     @Override
     public int describeContents() {
