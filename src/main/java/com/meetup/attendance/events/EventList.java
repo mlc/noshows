@@ -4,6 +4,7 @@ import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.app.ListActivity;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
@@ -66,8 +67,10 @@ public class EventList extends ListActivity {
     protected void onListItemClick(ListView l, View v, int position, long id) {
         Event e = adapter.getItem(position);
         Intent i = new Intent(this, Attendance.class)
+                .putExtra("title", e.name)
                 .putExtra("urlname", e.group.urlname)
-                .putExtra("event_id", e.id);
+                .putExtra("event_id", e.id)
+                .putExtra("url", Uri.parse(e.eventUrl));
         startActivity(i);
     }
 }

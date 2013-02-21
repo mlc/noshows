@@ -32,6 +32,7 @@ public class EventLoadFragment extends RestFragment {
         long now = System.currentTimeMillis();
         args.putString("time", (now - 1*TimeUnit.WEEK) + "," + now);
         args.putInt("page", 100);
+        args.putString("only", "id,name,group,time,yes_rsvp_count,event_url");
         RestService.call(this, Verb.GET, ENDPOINT, ParseMode.EVENTS_RESPONSE, args);
     }
 
