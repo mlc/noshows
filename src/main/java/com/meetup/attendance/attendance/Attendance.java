@@ -1,5 +1,6 @@
 package com.meetup.attendance.attendance;
 
+import java.util.List;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.app.ListActivity;
@@ -9,12 +10,11 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.Window;
+import com.google.common.base.Optional;
 import com.meetup.attendance.R;
 import com.meetup.attendance.rest.AttendanceRecord;
 
-import java.util.List;
-
-public class Attendance extends ListActivity {
+public class Attendance extends ListActivity implements ChangeFragment.Contract {
 
     private AttendanceAdapter adapter;
 
@@ -42,12 +42,14 @@ public class Attendance extends ListActivity {
             loaded(alf.getRecords());
 
         adapter = new AttendanceAdapter(this);
+        adapter.setNotifyOnChange(false);
         setListAdapter(adapter);
     }
 
     void loaded(List<AttendanceRecord> records) {
         adapter.clear();
         adapter.addAll(records);
+        adapter.notifyDataSetChanged();
     }
 
     @Override
@@ -74,5 +76,14 @@ public class Attendance extends ListActivity {
         Intent i = new Intent(Intent.ACTION_VIEW, getIntent().<Uri>getParcelableExtra("url"))
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(i);
+    }
+
+    @Override
+    public void notifyChange(long memberId, AttendanceRecord.Status newStatus) {
+        Optional<AttendanceRecord> oar = adapter.getItemByMemberId(memberId);
+        if (oar.isPresent()) {
+            oar.get().status = newStatus;
+            adapter.notifyDataSetChanged();
+        }
     }
 }

@@ -6,6 +6,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.TextView;
+import com.google.common.base.Optional;
 import com.meetup.attendance.R;
 import com.meetup.attendance.rest.AttendanceRecord;
 
@@ -22,12 +23,21 @@ public class AttendanceAdapter extends ArrayAdapter<AttendanceRecord> {
 
     @Override
     public boolean hasStableIds() {
-        return super.hasStableIds();
+        return true;
     }
 
     @Override
     public long getItemId(int position) {
         return getItem(position).member.id;
+    }
+
+    public Optional<AttendanceRecord> getItemByMemberId(long id) {
+        for (int i = 0, size = getCount(); i < size; ++i) {
+            AttendanceRecord ar = getItem(i);
+            if (ar.member.id == id)
+                return Optional.of(ar);
+        }
+        return Optional.absent();
     }
 
     @Override

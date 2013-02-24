@@ -1,5 +1,6 @@
 package com.meetup.attendance.attendance;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
@@ -13,8 +14,15 @@ import com.meetup.attendance.http.Verb;
 import com.meetup.attendance.rest.AttendanceRecord;
 import com.meetup.attendance.rest.AttendanceRecord.Status;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 public class ChangeFragment extends DialogFragment implements DialogInterface.OnClickListener {
     static final Status[] STATI = Status.values();
+    private Contract contract;
+
+    public static interface Contract {
+        void notifyChange(long memberId, Status newStatus);
+    }
 
     private static class Adapter extends ArrayAdapter<Status> {
         public Adapter(Context context) {
@@ -42,6 +50,19 @@ public class ChangeFragment extends DialogFragment implements DialogInterface.On
         return cf;
     }
 
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        checkArgument(activity instanceof Contract);
+        contract = (Contract)activity;
+    }
+
+    @Override
+    public void onDetach() {
+        contract = null;
+        super.onDetach();
+    }
+
     public AttendanceRecord getRecord() {
         return getArguments().getParcelable("record");
     }
@@ -62,9 +83,12 @@ public class ChangeFragment extends DialogFragment implements DialogInterface.On
     @Override
     public void onClick(DialogInterface dialog, int which) {
         Bundle params = new Bundle();
-        params.putLong("member", getRecord().member.id);
-        params.putParcelable("status", STATI[which]);
+        final long memberId = getRecord().member.id;
+        final Status status = STATI[which];
+        params.putLong("member", memberId);
+        params.putParcelable("status", status);
         RestService.call(getActivity(), Verb.POST, getUri(), null, params);
+        contract.notifyChange(memberId, status);
 
         dismiss();
     }
