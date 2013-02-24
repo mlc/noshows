@@ -31,7 +31,6 @@ public class EventList extends ListActivity {
             return;
         }
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
-        setProgressBarIndeterminate(true);
         setProgressBarIndeterminateVisibility(true);
 
         FragmentManager fm = getFragmentManager();
@@ -50,7 +49,6 @@ public class EventList extends ListActivity {
     }
 
     void loadData(EventsResponse response) {
-        setProgressBarIndeterminate(false);
         setProgressBarIndeterminateVisibility(false);
 
         List<Event> results = response.results;
@@ -90,16 +88,11 @@ public class EventList extends ListActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
         case R.id.logout:
-            logOut();
+            new LogOutTask(this).execute();
             return true;
 
         default:
             return super.onOptionsItemSelected(item);
         }
     }
-
-    void logOut() {
-        new LogOutTask(this).execute();
-    }
-
 }

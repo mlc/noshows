@@ -17,6 +17,14 @@ class LogOutTask extends AsyncTask<Void, Void, Boolean> {
     }
 
     @Override
+    protected void onPreExecute() {
+        super.onPreExecute();
+        Activity activity = activityRef.get();
+        if (activity != null)
+            activity.setProgressBarIndeterminateVisibility(true);
+    }
+
+    @Override
     protected Boolean doInBackground(Void... params) {
         webViewDatabase.clearFormData();
         webViewDatabase.clearHttpAuthUsernamePassword();
