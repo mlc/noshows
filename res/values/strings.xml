@@ -3,4 +3,6 @@
     <string name="hello_world">Hello world!</string>
     <string name="change">Change</string>
     <string name="view_event">View Event</string>
+  <string name="log_in_error">Error logging in.</string>
+  <string name="logout">Log Out</string>
 </resources>

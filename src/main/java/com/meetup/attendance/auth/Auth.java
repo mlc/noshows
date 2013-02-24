@@ -7,13 +7,12 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import com.google.common.base.Objects;
-import com.meetup.attendance.events.EventList;
 import com.meetup.attendance.R;
-
-import static com.google.common.base.Preconditions.checkArgument;
+import com.meetup.attendance.events.EventList;
 
 public class Auth extends Activity {
     static final String TAG = "Auth";
@@ -29,6 +28,9 @@ public class Auth extends Activity {
 
         webView = (WebView)findViewById(R.id.auth_webview);
         webView.setWebViewClient(new WebClient());
+        WebSettings webSettings = webView.getSettings();
+        webSettings.setSavePassword(false);
+
         empty = findViewById(android.R.id.empty);
 
         FragmentManager fm = getFragmentManager();
@@ -76,10 +78,7 @@ public class Auth extends Activity {
     }
 
     void loggedIn() {
-        Intent returnTo = getIntent().getParcelableExtra("return_to");
-        if (returnTo == null)
-            returnTo = new Intent(this, EventList.class);
-        startActivity(returnTo);
+        startActivity(new Intent(this, EventList.class));
         finish();
     }
 

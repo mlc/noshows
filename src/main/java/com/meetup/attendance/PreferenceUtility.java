@@ -1,12 +1,11 @@
 package com.meetup.attendance;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Pair;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 public class PreferenceUtility {
     private static PreferenceUtility instance;
@@ -31,7 +30,7 @@ public class PreferenceUtility {
         return prefs.contains("oauth_token") && prefs.contains("oauth_secret");
     }
 
-    public void setOauthCreds(@Nullable String token, @Nullable String secret) {
+    public boolean setOauthCreds(@Nullable String token, @Nullable String secret) {
         SharedPreferences.Editor ed = prefs.edit();
         if (token == null || secret == null) {
             ed.remove("oauth_token");
@@ -40,6 +39,6 @@ public class PreferenceUtility {
             ed.putString("oauth_token", token);
             ed.putString("oauth_secret", secret);
         }
-        ed.apply();
+        return ed.commit();
     }
 }

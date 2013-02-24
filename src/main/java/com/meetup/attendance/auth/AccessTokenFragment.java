@@ -2,14 +2,18 @@ package com.meetup.attendance.auth;
 
 import android.app.Activity;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Pair;
+import android.widget.Toast;
 import com.meetup.attendance.PreferenceUtility;
+import com.meetup.attendance.R;
 import com.meetup.attendance.http.OAuthMode;
 import com.meetup.attendance.http.ParseMode;
 import com.meetup.attendance.http.RestService;
 import com.meetup.attendance.http.Verb;
 import com.meetup.attendance.rest.RestFragment;
+import org.apache.http.HttpStatus;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
@@ -61,12 +65,29 @@ class AccessTokenFragment extends RestFragment {
 
     @Override
     protected void onRestResult(int resultCode, Bundle data) {
-        String token = data.getString("oauth_token");
-        String tokenSecret = data.getString("oauth_token_secret");
-        PreferenceUtility.getInstance().setOauthCreds(token, tokenSecret);
-        Auth activity = (Auth)getActivity();
-        if (activity != null)
-            activity.loggedIn();
-        done = true;
+        if (resultCode == HttpStatus.SC_OK) {
+            final String token = data.getString("oauth_token");
+            final String tokenSecret = data.getString("oauth_token_secret");
+            new AsyncTask<Void, Void, Boolean>() {
+                @Override
+                protected Boolean doInBackground(Void... params) {
+                    return PreferenceUtility.getInstance().setOauthCreds(token, tokenSecret);
+                }
+
+                @Override
+                protected void onPostExecute(Boolean couldSave) {
+                    Auth activity = (Auth)getActivity();
+                    if (activity != null) {
+                        if (couldSave)
+                            activity.loggedIn();
+                        else
+                            Toast.makeText(activity, R.string.log_in_error, Toast.LENGTH_SHORT);
+                    }
+                }
+            }.execute();
+            done = true;
+        } else {
+            Toast.makeText(getActivity(), R.string.log_in_error, Toast.LENGTH_SHORT).show();
+        }
     }
 }

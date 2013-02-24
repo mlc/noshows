@@ -1,21 +1,23 @@
 package com.meetup.attendance.events;
 
+import java.util.List;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.app.ListActivity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.ListView;
 import com.meetup.attendance.PreferenceUtility;
+import com.meetup.attendance.R;
 import com.meetup.attendance.attendance.Attendance;
 import com.meetup.attendance.auth.Auth;
 import com.meetup.attendance.rest.Event;
 import com.meetup.attendance.rest.EventsResponse;
-
-import java.util.List;
 
 public class EventList extends ListActivity {
     EventAdapter adapter;
@@ -24,7 +26,7 @@ public class EventList extends ListActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (!PreferenceUtility.getInstance().isLoggedIn()) {
-            startActivity(new Intent(this, Auth.class).putExtra("return_to", getIntent()));
+            startActivity(new Intent(this, Auth.class));
             finish();
             return;
         }
@@ -34,6 +36,10 @@ public class EventList extends ListActivity {
 
         FragmentManager fm = getFragmentManager();
         EventLoadFragment elf = (EventLoadFragment)fm.findFragmentByTag("event_load");
+
+        adapter = new EventAdapter(this);
+        setListAdapter(adapter);
+
         if (elf == null) {
             FragmentTransaction ft = fm.beginTransaction();
             ft.add(new EventLoadFragment(), "event_load");
@@ -41,8 +47,6 @@ public class EventList extends ListActivity {
         } else if (elf.haveData()) {
             loadData(elf.getResponse());
         }
-        adapter = new EventAdapter(this);
-        setListAdapter(adapter);
     }
 
     void loadData(EventsResponse response) {
@@ -60,6 +64,8 @@ public class EventList extends ListActivity {
                 break;
             }
         }
+        if (r == 0)
+            r = results.size() - 1;
         getListView().smoothScrollToPositionFromTop(r, 0, 0);
     }
 
@@ -73,4 +79,27 @@ public class EventList extends ListActivity {
                 .putExtra("url", Uri.parse(e.eventUrl));
         startActivity(i);
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_event_list, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+        case R.id.logout:
+            logOut();
+            return true;
+
+        default:
+            return super.onOptionsItemSelected(item);
+        }
+    }
+
+    void logOut() {
+        new LogOutTask(this).execute();
+    }
+
 }
