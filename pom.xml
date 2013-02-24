@@ -10,7 +10,9 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-
+        <secrets.template.file>src/main/java/com/meetup/attendance/http/Secrets.java.template</secrets.template.file>
+        <secrets.dir>target/generated-sources/secrets</secrets.dir>
+        <secrets.file>${secrets.dir}/com/meetup/attendance/http/Secrets.java</secrets.file>
         <!-- Plugins -->
         <android-maven-plugin.version>3.5.0</android-maven-plugin.version>
         <maven-compiler-plugin.version>2.3.2</maven-compiler-plugin.version>
@@ -103,6 +105,44 @@
             </plugins>
         </pluginManagement>
         <plugins>
+            <plugin>
+              <groupId>com.google.code.maven-replacer-plugin</groupId>
+              <artifactId>replacer</artifactId>
+              <version>1.5.2</version>
+              <executions>
+                <execution>
+                  <phase>generate-sources</phase>
+                  <goals>
+                    <goal>replace</goal>
+                  </goals>
+                </execution>
+              </executions>
+              <configuration>
+                <file>${secrets.template.file}</file>
+                <outputFile>${secrets.file}</outputFile>
+                <tokenValueMap>secrets.properties</tokenValueMap>
+                <delimiters><delimiter>@</delimiter></delimiters>
+              </configuration>
+            </plugin>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>build-helper-maven-plugin</artifactId>
+            <version>1.7</version>
+            <executions>
+              <execution>
+                <id>add-source</id>
+                <phase>generate-sources</phase>
+                <goals>
+                  <goal>add-source</goal>
+                </goals>
+                <configuration>
+                  <sources>
+                    <source>${secrets.dir}</source>
+                  </sources>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
             <plugin>
                 <groupId>com.jayway.maven.plugins.android.generation2</groupId>
                 <artifactId>android-maven-plugin</artifactId>
