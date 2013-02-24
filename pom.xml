@@ -9,6 +9,17 @@
   <packaging>apk</packaging>
   <name>Noshows</name>
 
+  <developers>
+    <developer>
+      <id>mlc</id>
+      <name>Mike Castleman</name>
+      <email>mlc@meetup.com</email>
+      <organization>Meetup</organization>
+      <organizationUrl>http://www.meetup.com/</organizationUrl>
+      <timezone>America/New_York</timezone>
+    </developer>
+  </developers>
+
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <secrets.template.file>src/main/java/com/meetup/attendance/http/Secrets.java.template</secrets.template.file>
