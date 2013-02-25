@@ -1,4 +1,4 @@
-package com.meetup.attendance.events;
+package com.meetup.attendance.attendance;
 
 import java.lang.ref.WeakReference;
 import android.app.Activity;
@@ -7,7 +7,7 @@ import android.webkit.CookieManager;
 import android.webkit.WebViewDatabase;
 import com.meetup.attendance.PreferenceUtility;
 
-class LogOutTask extends AsyncTask<Void, Void, Boolean> {
+public class LogOutTask extends AsyncTask<Void, Void, Boolean> {
     private WeakReference<Activity> activityRef;
     private WebViewDatabase webViewDatabase;
 
@@ -34,7 +34,7 @@ class LogOutTask extends AsyncTask<Void, Void, Boolean> {
     }
 
     @Override
-    protected void onPostExecute(Boolean dummy) {
+    protected void onPostExecute(Boolean success) {
         Activity activity = activityRef.get();
         if (activity != null)
             activity.finish();

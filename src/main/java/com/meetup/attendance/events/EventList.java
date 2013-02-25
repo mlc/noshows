@@ -15,6 +15,7 @@ import android.widget.ListView;
 import com.meetup.attendance.PreferenceUtility;
 import com.meetup.attendance.R;
 import com.meetup.attendance.attendance.Attendance;
+import com.meetup.attendance.attendance.LogOutTask;
 import com.meetup.attendance.auth.Auth;
 import com.meetup.attendance.rest.Event;
 import com.meetup.attendance.rest.EventsResponse;
