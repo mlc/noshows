@@ -1,7 +1,7 @@
 Meetup Attendance Taker
 =======================
 
-This is an small app to allow Meetup Organizers to take attendance at their Meetups. It may also be interesting as a sample of accessing the [Meetup API][] in an an Android app.
+This is a small app to allow Meetup Organizers to take attendance at their Meetups. It may also be interesting as a sample of accessing the [Meetup API][] in an Android app.
 
 Building
 --------
